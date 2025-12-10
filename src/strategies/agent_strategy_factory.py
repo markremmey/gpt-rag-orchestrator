@@ -2,6 +2,7 @@ from .single_agent_rag_strategy import SingleAgentRAGStrategy
 from .agent_strategies import AgentStrategies
 from .mcp_strategy import McpStrategy
 from .nl2sql_strategy import NL2SQLStrategy
+from .plain_chat import PlainChatStrategy
 
 class AgentStrategyFactory:
     @staticmethod

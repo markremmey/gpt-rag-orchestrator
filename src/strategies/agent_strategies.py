@@ -8,3 +8,4 @@ class AgentStrategies(Enum):
     MCP        = "mcp"
     MULTIMODAL = "multimodal"
     NL2SQL     = "nl2sql"
+    PLAIN_CHAT = "plain_chat"
