@@ -2,6 +2,7 @@
 local/
 .local/
 .vscode/
+*.docx
 
 # Evaluations
 eval-input.jsonl 

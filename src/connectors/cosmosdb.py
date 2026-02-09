@@ -75,3 +75,18 @@ class CosmosDBClient:
                 document = None
                 logging.warning(f"[cosmosdb] could not update document: {e}", exc_info=True)
             return document
+
+    async def upsert_document(self, container_name, document) -> dict:
+        """
+        Upserts a document - creates if it doesn't exist, updates if it does.
+        """
+        async with CosmosClient(self.db_uri, credential=self.cfg.aiocredential) as db_client:
+            db = db_client.get_database_client(database=self.database_name)
+            container = db.get_container_client(container_name)
+            try:
+                document = await container.upsert_item(body=document)
+                logging.info(f"[cosmosdb] document {document.get('id')} upserted.")
+            except Exception as e:
+                document = None
+                logging.warning(f"[cosmosdb] could not upsert document: {e}", exc_info=True)
+            return document

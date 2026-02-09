@@ -40,30 +40,7 @@ from dependencies import get_config
 # ============================================================================
 
 class UserNegotiationProfile(BaseModel):
-    """User's negotiation profile - persisted across sessions."""
-    name: Optional[str] = Field(default=None, description="User's name")
-    role: Optional[str] = Field(default=None, description="User's role/title (e.g., Account Executive, Sales Manager)")
-    company: Optional[str] = Field(default=None, description="User's company name")
-    negotiation_style: Optional[str] = Field(default=None, description="User's preferred negotiation style")
-    strengths: List[str] = Field(default_factory=list, description="User's negotiation strengths")
-    areas_for_improvement: List[str] = Field(default_factory=list, description="Areas the user wants to improve")
-    past_experiences: List[str] = Field(default_factory=list, description="Notable past negotiation experiences")
-    goals: List[str] = Field(default_factory=list, description="User's negotiation goals")
-
-class BuyerProfile(BaseModel):
-    """Target buyer's profile - persisted across sessions."""
-    name: Optional[str] = Field(default=None, description="Buyer's name")
-    title: Optional[str] = Field(default=None, description="Buyer's title (e.g., Senior Director, CFO)")
-    company: Optional[str] = Field(default=None, description="Buyer's company")
-    negotiation_style: Optional[str] = Field(default=None, description="Observed negotiation style")
-    personality_traits: List[str] = Field(default_factory=list, description="Personality traits (e.g., aggressive, analytical)")
-    communication_patterns: List[str] = Field(default_factory=list, description="Communication patterns (e.g., tends to over-talk)")
-    known_priorities: List[str] = Field(default_factory=list, description="Known priorities and concerns")
-    past_interactions: List[str] = Field(default_factory=list, description="Notes from past interactions")
-    decision_making_style: Optional[str] = Field(default=None, description="How they make decisions")
-
-class ExtractedUserInfo(BaseModel):
-    """Structured extraction of user profile information from conversation."""
+    """User's negotiation profile - persisted across sessions and used for LLM extraction."""
     name: Optional[str] = None
     role: Optional[str] = None
     company: Optional[str] = None
@@ -73,8 +50,8 @@ class ExtractedUserInfo(BaseModel):
     past_experiences: List[str] = Field(default_factory=list)
     goals: List[str] = Field(default_factory=list)
 
-class ExtractedBuyerInfo(BaseModel):
-    """Structured extraction of buyer profile information from conversation."""
+class BuyerProfile(BaseModel):
+    """Target buyer's profile - persisted across sessions and used for LLM extraction."""
     name: Optional[str] = None
     title: Optional[str] = None
     company: Optional[str] = None
@@ -141,11 +118,11 @@ class UserProfileMemory(ContextProvider):
                         "Only extract information that is explicitly stated about the user themselves. "
                         "Return nulls/empty lists for fields not mentioned."
                     ),
-                    response_format=ExtractedUserInfo,
+                    response_format=UserNegotiationProfile,
                 ),
             )
 
-            if result.value and isinstance(result.value, ExtractedUserInfo):
+            if result.value and isinstance(result.value, UserNegotiationProfile):
                 extracted = result.value
                 # Update profile with new information (don't overwrite with None)
                 if extracted.name:
@@ -290,11 +267,11 @@ class BuyerProfileMemory(ContextProvider):
                         "Only extract information explicitly stated about the buyer. "
                         "Return nulls/empty lists for fields not mentioned."
                     ),
-                    response_format=ExtractedBuyerInfo,
+                    response_format=BuyerProfile,
                 ),
             )
 
-            if result.value and isinstance(result.value, ExtractedBuyerInfo):
+            if result.value and isinstance(result.value, BuyerProfile):
                 extracted = result.value
                 # Update profile with new information
                 if extracted.name:
